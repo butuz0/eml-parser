@@ -1,6 +1,5 @@
 import email
 from email import policy
-from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Tuple, Optional
 
@@ -13,7 +12,7 @@ def parse_eml(file_path: str | Path) -> EmailData:
         raise ValueError(f'.eml file not found: {file_path!r}')
     if path.suffix != '.eml':
         raise ValueError(f'.eml file expected, got: {file_path!r}')
- 
+
     with open(path, 'rb') as file:
         msg = email.message_from_binary_file(file, policy=policy.default)
 
@@ -22,7 +21,7 @@ def parse_eml(file_path: str | Path) -> EmailData:
 
     return EmailData(
         email_from=msg.get('From'),
-        date=parsedate_to_datetime(msg.get('Date')),
+        date=msg.get('Date').datetime,
         email_to=msg.get('To'),
         delivered_to=msg.get('Delivered-To'),
         cc=msg.get('Cc'),
@@ -34,7 +33,7 @@ def parse_eml(file_path: str | Path) -> EmailData:
     )
 
 
-def _extract_bodies(msg: email.message.Message) -> Tuple[Optional[str], Optional[str]]:
+def _extract_bodies(msg: email.message.EmailMessage) -> Tuple[Optional[str], Optional[str]]:
     text_body = None
     html_body = None
 
@@ -43,17 +42,16 @@ def _extract_bodies(msg: email.message.Message) -> Tuple[Optional[str], Optional
             continue
 
         content_type = part.get_content_type()
-        content_charset = part.get_content_charset('utf-8')
 
         if content_type == 'text/plain':
-            text_body = part.get_payload(decode=True).decode(content_charset, errors='replace')
+            text_body = part.get_content()
         elif content_type == 'text/html':
-            html_body = part.get_payload(decode=True).decode(content_charset, errors='replace')
+            html_body = part.get_content()
 
     return text_body, html_body
 
 
-def _extract_attachments(msg: email.message.Message) -> list[EmailAttachment]:
+def _extract_attachments(msg: email.message.EmailMessage) -> list[EmailAttachment]:
     attachments = []
 
     for part in msg.walk():
