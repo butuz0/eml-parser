@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from parser import parse_eml
 from storage import save_email_to_disk
@@ -12,12 +13,12 @@ def main():
     arg_parser.add_argument(
         'eml_file',
         type=str,
-        help='.eml file to parse.'
+        help='.eml file to parse.',
     )
     arg_parser.add_argument(
         'output_dir',
         type=str,
-        help='Output directory for the parsed .eml file contents.'
+        help='Output directory for the parsed .eml file contents.',
     )
 
     args = arg_parser.parse_args()
@@ -32,6 +33,7 @@ def main():
         print(f'{args.eml_file!r} parsed successfully.')
     except Exception as e:
         print(f'Error: {e}')
+        sys.exit(1)
 
 
 if __name__ == '__main__':
