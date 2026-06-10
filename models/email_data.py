@@ -7,9 +7,9 @@ from .email_attachment import EmailAttachment
 
 @dataclass(frozen=True, slots=True)
 class EmailData:
-    email_from: str
-    date: dt.datetime
+    email_from: Optional[str] = None
     email_to: Optional[str] = None
+    date: Optional[dt.datetime] = None
     delivered_to: Optional[str] = None
     cc: Optional[str] = None
     subject: Optional[str] = None
@@ -27,7 +27,7 @@ class EmailData:
                 'cc': self.cc,
                 'subject': self.subject,
                 'thread_topic': self.thread_topic,
-                'date': self.date.isoformat(),
+                'date': self.date.isoformat() if self.date else None,
             },
             'text_body': self.text_body,
             'html_body': self.html_body,

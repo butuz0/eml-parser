@@ -18,10 +18,11 @@ def parse_eml(file_path: str | Path) -> EmailData:
 
     text_body, html_body = _extract_bodies(msg)
     attachments = _extract_attachments(msg)
+    date = msg.get('Date')
 
     return EmailData(
         email_from=msg.get('From'),
-        date=msg.get('Date').datetime,
+        date=date.datetime if date is not None else None,
         email_to=msg.get('To'),
         delivered_to=msg.get('Delivered-To'),
         cc=msg.get('Cc'),
