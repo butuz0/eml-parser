@@ -61,6 +61,5 @@ alias.
 
 ```bash
 cd ~/Downloads
-eml-parser sample.eml -o ./extracted_data
+eml-parser sample.eml ./extracted_data
 ```
-
