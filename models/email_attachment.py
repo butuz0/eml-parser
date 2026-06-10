@@ -7,10 +7,9 @@ class EmailAttachment:
     content_type: str
     payload: bytes
 
-    def to_dict(self) -> dict:
+    def to_meta_dict(self) -> dict:
         return {
             'filename': self.filename,
             'content_type': self.content_type,
-            # 'payload': self.payload,
             'size_bytes': len(self.payload),
         }

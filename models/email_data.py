@@ -31,5 +31,5 @@ class EmailData:
             },
             'text_body': self.text_body,
             'html_body': self.html_body,
-            'attachments': [att.to_dict() for att in self.attachments],
+            'attachments': [att.to_meta_dict() for att in self.attachments],
         }
