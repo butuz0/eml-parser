@@ -1,3 +1,5 @@
+"""CLI entrypoint for the EML parser."""
+
 import argparse
 import sys
 
@@ -6,6 +8,8 @@ from storage import save_email_to_disk
 
 
 def main():
+    """Parse command-line arguments and execute the EML parsing workflow."""
+
     arg_parser = argparse.ArgumentParser(
         description='A CLI tool for parsing .eml files and extracting '
                     'metadata, content, and attachments.'

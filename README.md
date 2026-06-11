@@ -5,13 +5,14 @@ saves the plain text and `HTML` bodies, and dumps all file attachments into the 
 
 ## Features
 
-- **Metadata Extraction**: Parses core email headers (From, To, Subject, Thread-Topic, Date, CC, Delivered-To) and saves
+- **Metadata Extraction**: Parses core email headers (From, To, Subject, Thread-Topic, Date, CC, Delivered-To) and
+  saves
   them in `meta.json`.
 
 - **Body Separation**: Extracts and decodes `text/plain` and `text/html` parts into dedicated `body.txt` and `body.html`
   files.
 
-- **Attachment Downloader**: Saves all email attachments them using their original filenames.
+- **OS-Safe Attachment Downloader**: Saves all email attachments using a strict filename sanitization pipeline.
 
 ## Requirements
 
@@ -26,8 +27,15 @@ contents will be saved
 python main.py emails/invoice.eml output/parsed_invoice
 ```
 
-This parses `invoice.eml` file, creates the `output/parsed_invoice` directory, and places all the extracted data
-inside it.
+Once executed, the tool organizes the parsed email components within the output directory as follows:
+
+```text
+output/parsed_invoice/
+├── meta.json             # Extracted headers and attachment mapping
+├── body.txt              # Text body
+├── body.html             # HTML body with localized attachment paths
+└── [attachment_files]    # Sanitized attachment files (e.g., report.pdf, logo_1.png)
+```
 
 ## Making the script globally accessible
 
