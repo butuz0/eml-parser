@@ -1,12 +1,20 @@
+"""
+Parsing logic for extracting metadata, content
+bodies, and attachments from EML files.
+"""
+
 import email
 from email import policy
 from pathlib import Path
 from typing import Tuple, Optional
 
 from models import EmailData, EmailAttachment
+from utils import sanitize_filename, replace_inline_attachments_src
 
 
 def parse_eml(file_path: str | Path) -> EmailData:
+    """Parse an EML file into a structured EmailData object."""
+
     path = Path(file_path).resolve()
     if not path.is_file():
         raise ValueError(f'.eml file not found: {file_path!r}')
@@ -18,6 +26,10 @@ def parse_eml(file_path: str | Path) -> EmailData:
 
     text_body, html_body = _extract_bodies(msg)
     attachments = _extract_attachments(msg)
+
+    if html_body:
+        html_body = replace_inline_attachments_src(html_body, attachments)
+
     date = msg.get('Date')
 
     return EmailData(
@@ -35,6 +47,8 @@ def parse_eml(file_path: str | Path) -> EmailData:
 
 
 def _extract_bodies(msg: email.message.EmailMessage) -> Tuple[Optional[str], Optional[str]]:
+    """Extract plain text and HTML bodies from the MIME message."""
+
     text_body = None
     html_body = None
 
@@ -53,17 +67,28 @@ def _extract_bodies(msg: email.message.EmailMessage) -> Tuple[Optional[str], Opt
 
 
 def _extract_attachments(msg: email.message.EmailMessage) -> list[EmailAttachment]:
+    """
+    Extract and decode attachments content and metadata
+    from a MIME message, assigning safe filenames.
+    """
+
     attachments = []
 
     for part in msg.walk():
-        if part.is_multipart() or (filename := part.get_filename()) is None:
+        if part.is_multipart() or (original_filename := part.get_filename()) is None:
             continue
+
+        safe_filename = sanitize_filename(original_filename)
+        cid = part.get('Content-ID')
 
         attachments.append(
             EmailAttachment(
-                filename=filename,
+                original_filename=original_filename,
+                safe_filename=safe_filename,
                 content_type=part.get_content_type(),
                 payload=part.get_payload(decode=True),
+                cid=cid.strip('<>') if cid else None,
+                content_disp=part.get_content_disposition(),
             )
         )
 

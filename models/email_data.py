@@ -1,3 +1,5 @@
+"""Data model representing email body and metadata."""
+
 from dataclasses import dataclass, field
 from typing import Optional
 import datetime as dt

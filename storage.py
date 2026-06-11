@@ -29,7 +29,7 @@ def save_email_to_disk(email_data: EmailData, output_dir: str) -> None:
         (path / BODY_HTML_FILENAME).write_text(email_data.html_body, encoding='utf-8')
 
     for att in email_data.attachments:
-        (path / att.filename).write_bytes(att.payload)
+        (path / att.safe_filename).write_bytes(att.payload)
 
     with open(path / METADATA_FILENAME, 'w') as file:
         json.dump(email_data.to_dict(), file, indent=4)
