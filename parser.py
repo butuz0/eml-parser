@@ -22,7 +22,7 @@ def parse_eml(file_path: str | Path) -> EmailData:
 
     return EmailData(
         email_from=msg.get('From'),
-        date=date.datetime if date is not None else None,
+        date=date.datetime if date else None,
         email_to=msg.get('To'),
         delivered_to=msg.get('Delivered-To'),
         cc=msg.get('Cc'),
