@@ -56,12 +56,12 @@ print_statistics() {
   local parsed_attachments=0
 
   if [ -d "$OUTPUT_DIR" ]; then
-    parsed_attachments=$(find "$OUTPUT_DIR" \
+    parsed_attachments=$(( $(find "$OUTPUT_DIR" \
       -type f \
       -not \( -name "$PARSED_TEXT" \
       -or -name "$PARSED_HTML" \
       -or -name "$PARSED_META" \) \
-      | wc -l)
+      | wc -l) ))
   fi
 
   echo -e "\n=========================================="
