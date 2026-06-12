@@ -12,7 +12,7 @@ if [ ! -d "$1" ]; then
   exit 1
 fi
 
-TARGET_DIR="${1%/}"
+TARGET_DIR="$(cd "$1" && pwd)"
 PARENT_DIR=$(dirname "$TARGET_DIR")
 BASE_NAME=$(basename "$TARGET_DIR")
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
