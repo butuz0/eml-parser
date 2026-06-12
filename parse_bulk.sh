@@ -20,6 +20,7 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 OUTPUT_NAME="${BASE_NAME}_output_${TIMESTAMP}"
 OUTPUT_DIR="${PARENT_DIR}/${OUTPUT_NAME}"
 ARCHIVE_PATH="${PARENT_DIR}/${OUTPUT_NAME}.tgz"
+LOG_FILE="${PARENT_DIR}/${OUTPUT_NAME}.log"
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON="python3"
@@ -33,10 +34,18 @@ total_found=0
 success_count=0
 error_count=0
 
+log_info() {
+  echo "[$(date '+%Y-%m-%d %T')] INFO: $*"
+}
+
+log_error() {
+  echo "[$(date '+%Y-%m-%d %T')] ERROR: $*" >&2
+}
+
 parse_eml_files(){
   mkdir "$OUTPUT_DIR"
 
-  echo "Scanning for .eml files in: ${TARGET_DIR}..."
+  log_info "Scanning for .eml files in: ${TARGET_DIR}..."
 
   while IFS= read -r -d '' file; do
     ((total_found++))
@@ -77,17 +86,21 @@ archive_output(){
     tar -czf "$ARCHIVE_PATH" -C "$PARENT_DIR" "$OUTPUT_NAME"
     rm -rf "$OUTPUT_DIR"
 
-    echo "Output archived to ${ARCHIVE_PATH}"
+    log_info "Output archived to ${ARCHIVE_PATH}"
   else
-    echo "No files were successfully parsed. Skipping archive creation."
+    log_error "No files were successfully parsed. Skipping archive creation."
     rmdir "$OUTPUT_DIR"
   fi
 }
 
-main() {
+run_pipeline(){
   parse_eml_files
   print_statistics
   archive_output
+}
+
+main() {
+  run_pipeline 2>&1 | tee "$LOG_FILE"
 }
 
 main "$@"
