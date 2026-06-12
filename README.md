@@ -62,8 +62,8 @@ Once executed, the bulk script creates an isolated, timestamped archive alongsid
 
 ```text
 /path/to/
-├── emails_directory/                     # Your source folder (untouched)
-└── emails_directory_20260611_181722.tgz  # The resulting parsed data archive
+├── emails_directory/                            # Your source folder (untouched)
+└── emails_directory_output_20260611_181722.tgz  # The resulting parsed data archive
 ```
 
 Inside the archive, every email gets its own dedicated subfolder containing its `meta.json`, `body.txt`, `body.html`,

@@ -13,12 +13,21 @@ if [ ! -d "$1" ]; then
 fi
 
 TARGET_DIR="${1%/}"
+PARENT_DIR=$(dirname "$TARGET_DIR")
+BASE_NAME=$(basename "$TARGET_DIR")
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-OUTPUT_DIR="${TARGET_DIR}/output_${TIMESTAMP}"
+
+OUTPUT_NAME="${BASE_NAME}_output_${TIMESTAMP}"
+OUTPUT_DIR="${PARENT_DIR}/${OUTPUT_NAME}"
+ARCHIVE_PATH="${PARENT_DIR}/${OUTPUT_NAME}.tgz"
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON="python3"
 PARSE_SCRIPT="${PROJECT_ROOT}/main.py"
+
+PARSED_TEXT="body.txt"
+PARSED_HTML="body.html"
+PARSED_META="meta.json"
 
 total_found=0
 success_count=0
@@ -49,9 +58,9 @@ print_statistics() {
   if [ -d "$OUTPUT_DIR" ]; then
     parsed_attachments=$(find "$OUTPUT_DIR" \
       -type f \
-      -not \( -name "body.txt" \
-      -or -name "body.html" \
-      -or -name "meta.json" \) \
+      -not \( -name "$PARSED_TEXT" \
+      -or -name "$PARSED_HTML" \
+      -or -name "$PARSED_META" \) \
       | wc -l)
   fi
 
@@ -65,12 +74,10 @@ print_statistics() {
 
 archive_output(){
   if [ "$success_count" -gt 0 ]; then
-    local archive_name="${TARGET_DIR}_${TIMESTAMP}.tgz"
-
-    tar -czf "${archive_name}" -C "${TARGET_DIR}" "output_${TIMESTAMP}"
+    tar -czf "$ARCHIVE_PATH" -C "$PARENT_DIR" "$OUTPUT_NAME"
     rm -rf "$OUTPUT_DIR"
 
-    echo "Output archived to ${archive_name}"
+    echo "Output archived to ${ARCHIVE_PATH}"
   else
     echo "No files were successfully parsed. Skipping archive creation."
     rmdir "$OUTPUT_DIR"
